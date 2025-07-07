@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 #root {
   display: flex;
   flex-direction: column;
@@ -34,12 +36,12 @@ header p {
   text-align: justify;
 }
 
-header button {
+/* header button {
   display: flex;
   border: 3px solid;
   align-items: center;
   gap: 1rem;
-  border-radius: 15px;
+  border-radius: 5px;
   margin-right: 2rem;
   font-size: medium;
   font-weight: 500;
@@ -48,7 +50,7 @@ header button {
 header button:hover {
   background-color: brown;
   cursor: pointer;
-}
+} */
 
 main {
   background-color: burlywood;
@@ -62,9 +64,9 @@ main h1 {
   margin-left: 1.5rem;
 }
 
-h3 {
+/* h3 {
   margin-left: 1.5rem;
-}
+} */
 
 .container {
   display: flex;
@@ -72,12 +74,12 @@ h3 {
   gap: 1px;
 }
 
-.section-header {
+/* .section-header {
   display: flex;
   align-items: center;
   gap: 1px;
   margin-left: 1rem;
-}
+} */
 
 .card-info {
   font-size: 1.25rem;
@@ -107,24 +109,26 @@ input {
   margin-left: 1.5rem;
 }
 
-.add-entry-button {
+/* .add-entry-button {
+  border: 3px solid;
   border-radius: 5px;
   margin: 1rem 1rem;
   width: 15%;
+  color: white;
 }
 
 .add-entry-button:hover {
   background-color: saddlebrown;
   cursor: pointer;
-}
+} */
 
-h2 {
+/* h2 {
   margin-left: 1.5rem;
-}
+} */
 
-h4 {
+/* h4 {
   margin-left: 1.5rem;
-}
+} */
 
 .benefit-list {
   display: flex;

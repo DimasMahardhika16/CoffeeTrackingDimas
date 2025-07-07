@@ -5,7 +5,7 @@ import Modal from "./Modal";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../Firebase";
 import { useAuth } from "../context/AuthContext";
-import { Input, Stack, Grid } from "@mantine/core";
+import { Input, Stack, Grid, Button, Select } from "@mantine/core";
 
 export default function CoffeeForm(props) {
   const { isAuthenticated } = props;
@@ -51,7 +51,6 @@ export default function CoffeeForm(props) {
 
       console.log("Saved:", timeStamp, selectedCoffee, coffeeCost);
 
-      // Reset form
       setSelectedCoffee(null);
       setHour(0);
       setMin(0);
@@ -72,12 +71,14 @@ export default function CoffeeForm(props) {
           <Authentication handleCloseModal={handleCloseModal} />
         </Modal>
       )}
-      <div className="section-header">
+      <div className="flex items-center gap-1 ml-6">
         <i className="fa-solid fa-pen-to-square"></i>
-        <h2> Start Your Tracking Today</h2>
+        <h2 className="font-bold font-mono ml-3"> Start Your Tracking Today</h2>
       </div>
-      <h4 className="coffee-grid">Please choose your coffee type</h4>
-      <Grid justify="center" align="center">
+      <h4 className="font-bold font-mono ml-6">
+        Please choose your coffee type
+      </h4>
+      <Grid justify="center" align="center" ml={10}>
         <Grid.Col span={12}>
           {coffeeOptions.slice(0, 5).map((option, optionIndex) => {
             return (
@@ -87,7 +88,7 @@ export default function CoffeeForm(props) {
                   setShowCoffeeTypes(false);
                 }}
                 className={
-                  "button-card" +
+                  "button-card ml-2 border-2 cursor-pointer" +
                   (option.name === selectedCoffee
                     ? "coffee-button-selected"
                     : "")
@@ -105,7 +106,8 @@ export default function CoffeeForm(props) {
               setSelectedCoffee(null);
             }}
             className={
-              "button-card" + (showCoffeeTypes ? "coffee-button-selected" : "")
+              "button-card ml-2 mt-2 border-2 cursor-pointer" +
+              (showCoffeeTypes ? "coffee-button-selected" : "")
             }
           >
             <h4>Other</h4>
@@ -115,6 +117,7 @@ export default function CoffeeForm(props) {
       </Grid>
       {showCoffeeTypes && (
         <select
+          className="w-100 ml-3 border-2 rounded-md"
           onChange={(e) => {
             setSelectedCoffee(e.target.value);
           }}
@@ -131,7 +134,7 @@ export default function CoffeeForm(props) {
           })}
         </select>
       )}
-      <h4>Add the Cost ($)</h4>
+      <h4 className="font-bold font-mono ml-6">Add the Cost ($)</h4>
       <Input
         onChange={(e) => {
           setCoffeeCost(e.target.value);
@@ -141,10 +144,12 @@ export default function CoffeeForm(props) {
         type="number"
         value={coffeeCost}
         px={"md"}
+        w={150}
+        ml={6}
       />
-      <h4>Time of Consumption</h4>
+      <h4 className="font-bold font-mono ml-6">Time of Consumption</h4>
       <div className="container-hours">
-        <h6>Hours</h6>
+        <h6 className="font-normal font-mono">Hours</h6>
         <select
           onChange={(e) => {
             setHour(e.target.value);
@@ -164,7 +169,7 @@ export default function CoffeeForm(props) {
         </select>
       </div>
       <div className="container-mins">
-        <h6>Mins</h6>
+        <h6 className="font-normal font-mono">Mins</h6>
         <select
           onChange={(e) => {
             setMin(e.target.value);
@@ -180,9 +185,17 @@ export default function CoffeeForm(props) {
           })}
         </select>
       </div>
-      <button className="add-entry-button" onClick={handleSubmitForm}>
-        <p>Add Entry</p>
-      </button>
+      <Button
+        radius={5}
+        color="rgba(112, 46, 8, 1)"
+        w={150}
+        ml={20}
+        ff={"monospace"}
+        className="mb-5"
+        onClick={handleSubmitForm}
+      >
+        Add Entry
+      </Button>
     </Stack>
   );
 }

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { Button, Modal } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 export default function Authentication(props) {
   const { handleCloseModal } = props;
@@ -49,7 +51,9 @@ export default function Authentication(props) {
   return (
     <>
       <h2 className="sign-up-text">{isRegistration ? "Sign Up" : "Login"}</h2>
-      <p>{isRegistration ? "Create an account" : "Sign in to your account!"}</p>
+      <p className="mb-2">
+        {isRegistration ? "Create an account" : "Sign in to your account!"}
+      </p>
       {error && <p>❌ {error}</p>}
       <input
         value={email}
@@ -57,6 +61,7 @@ export default function Authentication(props) {
           setEmail(e.target.value);
         }}
         placeholder="Email"
+        className="border-2 rounded-md mb-3"
       />
       <input
         value={password}
@@ -65,9 +70,13 @@ export default function Authentication(props) {
         }}
         placeholder="******"
         type="password"
+        className="border-2 rounded-md"
       />
-      <button onClick={handleAuthenticate}>
-        <p>{isAuthenticating ? "Authenticating..." : "Submit"}</p>
+      <button
+        onClick={handleAuthenticate}
+        className="border-2 rounded-md w-25 mt-3 hover:bg-blue-400 cursor-pointer"
+      >
+        {isAuthenticating ? "Authenticating..." : "Submit"}
       </button>
       <hr />
       <div className="register-content">
@@ -77,11 +86,12 @@ export default function Authentication(props) {
             : "Don't have an account?"}
         </p>
         <button
+          className="border-2 rounded-md w-25 hover:bg-blue-400 cursor-pointer"
           onClick={() => {
             setIsRegistration(!isRegistration);
           }}
         >
-          <p>{isRegistration ? "Sign in" : "Sign up"}</p>
+          {isRegistration ? "Sign in" : "Sign up"}
         </button>
       </div>
     </>

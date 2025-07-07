@@ -2,6 +2,7 @@ import { useState } from "react";
 import Authentication from "./Authentication";
 import Modal from "./Modal";
 import { useAuth } from "../context/AuthContext";
+import { Button } from "@mantine/core";
 
 export default function Layout(props) {
   const { children } = props;
@@ -9,31 +10,33 @@ export default function Layout(props) {
   const { globalUser, logout } = useAuth();
 
   const header = (
-    <header>
-      <div>
-        <h1 className="text-gradient">Caffeine Fellas</h1>
+    <header className="border-4">
+      <div className="font-mono font-bold p-7 text-xl">
+        <h1>Caffeine Fellas</h1>
         <p>For Enjoy & Relax Coffee</p>
       </div>
       {globalUser ? (
-        <button onClick={logout}>
+        <Button onClick={logout}>
           <p>Logout</p>
-        </button>
+        </Button>
       ) : (
-        <button
+        <Button
+          className="mr-8"
+          color="rgba(112, 46, 8, 1)"
           onClick={() => {
             setShowModal(true);
           }}
         >
           <p>Sign Up For Free</p>
-          <i className="fa-solid fa-mug-saucer"></i>
-        </button>
+          <i className="fa-solid fa-mug-saucer mr-4 ml-4"></i>
+        </Button>
       )}
     </header>
   );
 
   const footer = (
-    <footer>
-      <p>
+    <footer className="rounded-lg border-4">
+      <p className="ml-5 font-bold font-mono">
         <span className="text-gradient">Caffeine Fellas</span> was made by Dimas{" "}
       </p>
     </footer>
@@ -51,7 +54,7 @@ export default function Layout(props) {
         </Modal>
       )}
       {header}
-      <main>{children}</main>
+      <main className="border-4 rounded-md">{children}</main>
       {footer}
     </>
   );
