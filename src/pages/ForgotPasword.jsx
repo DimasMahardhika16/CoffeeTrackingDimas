@@ -24,7 +24,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-cyan-300 px-4">
+    <div className="flex items-center justify-center min-h-screen px-4">
       <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold font-mono text-center mb-4">
           Forgot Password
@@ -49,6 +49,7 @@ export default function ForgotPassword() {
             size="sm"
             radius="md"
             fullWidth
+            color="Burlywood"
           >
             Send Reset Link
           </Button>
@@ -56,7 +57,7 @@ export default function ForgotPassword() {
 
         <p className="text-center mt-4 text-sm font-mono">
           Remember Password?{" "}
-          <Link to="/login" className="text-blue-600 underline">
+          <Link to="/login" className="text-blue-900 hover:underline">
             Back to Login
           </Link>
         </p>

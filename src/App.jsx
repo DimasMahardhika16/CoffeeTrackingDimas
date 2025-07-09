@@ -21,9 +21,17 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import "@mantine/core/styles.css";
 import { createTheme, MantineProvider } from "@mantine/core";
 import ForgotPassword from "./pages/ForgotPasword";
+import { generateColors } from "@mantine/colors-generator";
 
 const theme = createTheme({
   fontFamily: "nunito-sans",
+  colors: {
+    Burlywood: generateColors("#deb887"),
+    Chocolate: generateColors("#d2961e"),
+    Brown: generateColors("#a52a2a"),
+    Bisque: generateColors("#ffe4c4"),
+    Beige: generateColors("#f5f5dc"),
+  },
 });
 
 function HomePage() {

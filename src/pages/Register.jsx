@@ -38,7 +38,7 @@ export default function Register() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-cyan-300 px-4">
+    <div className="flex items-center justify-center min-h-screen px-4">
       <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center font-mono">Register</h2>
         <h2 className="font-mono text-center mb-5">
@@ -75,7 +75,8 @@ export default function Register() {
             variant="filled"
             radius={"md"}
             size="sm"
-            w={100}
+            fullWidth
+            color="Burlywood"
           >
             Register
           </Button>
@@ -83,7 +84,7 @@ export default function Register() {
 
         <p className="text-center mt-4 text-sm font-mono">
           Do You Have Account?{" "}
-          <Link to="/login" className="text-blue-600 underline">
+          <Link to="/login" className="text-blue-900 hover:underline">
             Login
           </Link>
         </p>

@@ -21,7 +21,7 @@ export default function Layout({ children }) {
         {globalUser && (
           <>
             <span className="text-sm font-medium">{globalUser.email}</span>
-            <Button color="rgba(112, 46, 8, 1)" onClick={handleLogout}>
+            <Button color="Burlywood" variant="filled" onClick={handleLogout}>
               Logout
             </Button>
           </>
@@ -40,10 +40,12 @@ export default function Layout({ children }) {
   );
 
   return (
-    <>
+    <div className="content">
       {header}
-      <main className="border-4 rounded-md p-4 min-h-screen">{children}</main>
+      <main className="border-4 rounded-md p-4 min-h-screen mt-4 mb-4">
+        {children}
+      </main>
       {footer}
-    </>
+    </div>
   );
 }

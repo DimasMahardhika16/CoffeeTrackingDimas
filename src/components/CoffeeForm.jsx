@@ -33,17 +33,10 @@ export default function CoffeeForm({ isAuthenticated }) {
         const menuSnap = await getDocs(collection(db, "menus"));
         const firestoreMenus = menuSnap.docs.map((doc) => doc.data());
 
-        // Menggabungkan firestoreMenus dengan coffeeOptions, lalu hilangkan duplikat berdasarkan nama
-        const allMenus = [...coffeeOptions, ...firestoreMenus];
-
-        // Mmebuat map unik berdasarkan nama
-        const uniqueMenus = Array.from(
-          new Map(allMenus.map((item) => [item.name, item])).values()
-        );
-
-        setMenuOptions(uniqueMenus);
+        setMenuOptions(firestoreMenus); // Tidak perlu gabungkan dengan coffeeOptions
       } catch (err) {
         console.error("Failed to fetch menu:", err.message);
+        setMenuOptions(coffeeOptions); // fallback kalau error
       }
     };
 
@@ -124,7 +117,7 @@ export default function CoffeeForm({ isAuthenticated }) {
     }
   };
 
-  const handleDeleteLastEntry = async () => {
+  const handleDeleteAllEntries = async () => {
     try {
       const history = globalData?.coffeeConsumptionHistory;
       if (!history || Object.keys(history).length === 0) {
@@ -132,31 +125,26 @@ export default function CoffeeForm({ isAuthenticated }) {
         return;
       }
 
-      const timestamps = Object.keys(history).map(Number);
-      const latestTimestamp = Math.max(...timestamps);
-
-      const updatedHistory = { ...history };
-      delete updatedHistory[latestTimestamp];
+      const confirmed = window.confirm(
+        "Are you sure you want to delete ALL entries?"
+      );
+      if (!confirmed) return;
 
       const updatedData = {
         ...globalData,
-        coffeeConsumptionHistory: updatedHistory,
+        coffeeConsumptionHistory: {},
       };
 
       setGlobalData(updatedData);
 
       const userRef = doc(db, "users", globalUser.uid);
-      await setDoc(
-        userRef,
-        { coffeeConsumptionHistory: updatedHistory },
-        { merge: true }
-      );
+      await setDoc(userRef, { coffeeConsumptionHistory: {} }, { merge: true });
 
       if (refreshUserData) await refreshUserData();
 
-      alert("Last entry deleted successfully.");
+      alert("All entries deleted successfully.");
     } catch (err) {
-      console.error("Error deleting entry:", err.message);
+      console.error("Error deleting entries:", err.message);
     }
   };
 
@@ -204,8 +192,9 @@ export default function CoffeeForm({ isAuthenticated }) {
 
             <Button
               variant={showCoffeeTypes ? "filled" : "outline"}
-              color="gray"
+              color="brown"
               size="lg"
+              fw="bold"
               onClick={() => {
                 setShowCoffeeTypes(true);
                 setSelectedCoffee(null);
@@ -283,7 +272,7 @@ export default function CoffeeForm({ isAuthenticated }) {
       <Group ml={25} mt={10} mb={10}>
         <Button
           radius={5}
-          color="brown"
+          color="Chocolate"
           w={150}
           ff="monospace"
           onClick={handleSubmitForm}
@@ -293,10 +282,10 @@ export default function CoffeeForm({ isAuthenticated }) {
         <Button
           radius={5}
           variant="filled"
-          color="red"
+          color="Burlywood"
           w={150}
           ff="monospace"
-          onClick={handleDeleteLastEntry}
+          onClick={handleDeleteAllEntries}
         >
           Delete Entry
         </Button>

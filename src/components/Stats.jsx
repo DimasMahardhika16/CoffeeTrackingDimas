@@ -74,7 +74,7 @@ export default function Stats() {
         </StatCard>
         <StatCard title="Avg # of Coffees">
           <p>
-            <span className="stat-text">{stats.average_coffees}</span>
+            <span className="stat-text">{stats.averageCaffeine}</span>
           </p>
         </StatCard>
         <StatCard title="Daily Cost ($)">
@@ -84,26 +84,22 @@ export default function Stats() {
         </StatCard>
         <StatCard title="Total Cost ($)">
           <p>
-            $ <span className="stat-text">{stats.total_cost}</span>
+            $ <span className="stat-text">{stats.totalCost}</span>
           </p>
         </StatCard>
 
-        <Table
-          striped
-          highlightOnHover
-          withTableBorder
-          withColumnBorders
-          mt={6}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Coffee Name</Table.Th>
-              <Table.Th>Number of Purchase</Table.Th>
-              <Table.Th>Percentage of Total</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{coffeeRows}</Table.Tbody>
-        </Table>
+        <div className="border-3">
+          <Table striped withTableBorder withColumnBorders>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Coffee Name</Table.Th>
+                <Table.Th>Number of Purchase</Table.Th>
+                <Table.Th>Percentage of Total</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{coffeeRows}</Table.Tbody>
+          </Table>
+        </div>
       </div>
     </>
   );

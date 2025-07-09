@@ -30,7 +30,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-cyan-300 px-4">
+    <div className="flex items-center justify-center min-h-screen bg-grey-100 px-4">
       <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold font-mono text-center">Login</h2>
         <h2 className="font-mono text-center mb-5">Hellow Fellas!</h2>
@@ -58,29 +58,30 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <div className="flex items-center justify-between mt-2">
-              <Button
-                type="submit"
-                variant="filled"
-                size="sm"
-                radius={"md"}
-                w={100}
-              >
-                Login
-              </Button>
+            <div className="flex justify-end mt-2 mb-2">
               <Link
                 to="/forgot-password"
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-blue-900 hover:underline"
               >
                 Forgot Password?
               </Link>
             </div>
+            <Button
+              type="submit"
+              variant="filled"
+              size="sm"
+              radius={"md"}
+              fullWidth
+              color="Burlywood"
+            >
+              Login
+            </Button>
           </div>
         </form>
 
         <p className="text-center mt-4 text-sm font-mono">
           Don&apos;t have account?{" "}
-          <Link to="/register" className="text-blue-600 underline">
+          <Link to="/register" className="text-blue-900 hover:underline">
             Register
           </Link>
         </p>

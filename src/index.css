@@ -3,20 +3,18 @@
 #root {
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   padding: 1rem;
   gap: 1rem;
-  max-width: 800px;
+  /* max-width: 800px; */
   width: 100%;
   min-height: 100vh;
-  background-color: bisque;
+  background-color: burlywood;
 }
 
-body {
-  background-color: bisque;
-  color: white;
-  font-size: large;
-  line-height: 1.6rem;
+.content {
+  margin: 0 auto;
+  max-width: 800px;
 }
 
 header {
@@ -24,8 +22,9 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  background-color: chocolate;
+  background-color: bisque;
   border-radius: 10px;
+  color: saddlebrown;
 }
 
 header h1 {
@@ -37,24 +36,8 @@ header p {
   text-align: justify;
 }
 
-/* header button {
-  display: flex;
-  border: 3px solid;
-  align-items: center;
-  gap: 1rem;
-  border-radius: 5px;
-  margin-right: 2rem;
-  font-size: medium;
-  font-weight: 500;
-}
-
-header button:hover {
-  background-color: brown;
-  cursor: pointer;
-} */
-
 main {
-  background-color: burlywood;
+  background-color: bisque;
   color: saddlebrown;
   font-size: large;
   line-height: 1.6rem;
@@ -65,22 +48,11 @@ main h1 {
   margin-left: 1.5rem;
 }
 
-/* h3 {
-  margin-left: 1.5rem;
-} */
-
 .container {
   display: flex;
   align-items: center;
   gap: 1px;
 }
-
-/* .section-header {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-  margin-left: 1rem;
-} */
 
 .card-info {
   font-size: 1.25rem;
@@ -109,27 +81,6 @@ input {
 .container-mins {
   margin-left: 1.5rem;
 }
-
-/* .add-entry-button {
-  border: 3px solid;
-  border-radius: 5px;
-  margin: 1rem 1rem;
-  width: 15%;
-  color: white;
-}
-
-.add-entry-button:hover {
-  background-color: saddlebrown;
-  cursor: pointer;
-} */
-
-/* h2 {
-  margin-left: 1.5rem;
-} */
-
-/* h4 {
-  margin-left: 1.5rem;
-} */
 
 .benefit-list {
   display: flex;
@@ -176,7 +127,8 @@ input {
 }
 
 footer {
-  background-color: chocolate;
+  background-color: bisque;
+  color: saddlebrown;
   padding: 1rem 0;
   display: flex;
   flex-wrap: wrap;

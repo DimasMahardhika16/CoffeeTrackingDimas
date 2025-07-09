@@ -25,7 +25,7 @@ export default function NotFound() {
         onClick={handleBack}
         variant="filled"
         radius={10}
-        color="rgba(112, 46, 8, 1)"
+        color="Burlywood"
       >
         {globalUser ? "Back to Dashboard" : "Back to Login"}
       </Button>
