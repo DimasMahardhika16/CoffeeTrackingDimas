@@ -1,68 +1,164 @@
-import { coffeeOptions } from "../Service/index";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { doc, setDoc, collection, getDocs } from "firebase/firestore";
+import { db } from "../config/firebase";
+import { useAuth } from "../context/AuthContext";
+import {
+  Input,
+  Stack,
+  Grid,
+  Button,
+  Select,
+  Group,
+  Text,
+  Box,
+} from "@mantine/core";
 import Authentication from "./Authentication";
 import Modal from "./Modal";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../../Firebase";
-import { useAuth } from "../context/AuthContext";
-import { Input, Stack, Grid, Button, Select } from "@mantine/core";
+import { coffeeOptions } from "../Service"; // optional sebagai fallback default
 
-export default function CoffeeForm(props) {
-  const { isAuthenticated } = props;
+export default function CoffeeForm({ isAuthenticated }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedCoffee, setSelectedCoffee] = useState(null);
   const [showCoffeeTypes, setShowCoffeeTypes] = useState(false);
-  const [coffeeCost, setCoffeeCost] = useState(0);
+  const [coffeeCost, setCoffeeCost] = useState("");
   const [hour, setHour] = useState(0);
   const [min, setMin] = useState(0);
+  const [menuOptions, setMenuOptions] = useState(coffeeOptions); // default fallback
 
-  const { globalData, setGlobalData, globalUser } = useAuth();
+  const { globalData, setGlobalData, globalUser, refreshUserData } = useAuth();
 
-  async function handleSubmitForm() {
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        const menuSnap = await getDocs(collection(db, "menus"));
+        const firestoreMenus = menuSnap.docs.map((doc) => doc.data());
+
+        // Menggabungkan firestoreMenus dengan coffeeOptions, lalu hilangkan duplikat berdasarkan nama
+        const allMenus = [...coffeeOptions, ...firestoreMenus];
+
+        // Mmebuat map unik berdasarkan nama
+        const uniqueMenus = Array.from(
+          new Map(allMenus.map((item) => [item.name, item])).values()
+        );
+
+        setMenuOptions(uniqueMenus);
+      } catch (err) {
+        console.error("Failed to fetch menu:", err.message);
+      }
+    };
+
+    fetchMenus();
+  }, []);
+
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleResetForm = () => {
+    setSelectedCoffee(null);
+    setShowCoffeeTypes(false);
+    setCoffeeCost("");
+    setHour(0);
+    setMin(0);
+  };
+
+  const handleSubmitForm = async () => {
     if (!isAuthenticated) {
       setShowModal(true);
       return;
     }
 
     if (!selectedCoffee) {
+      alert("Please select a coffee type.");
+      return;
+    }
+
+    const costValue = parseFloat(coffeeCost);
+    if (isNaN(costValue) || costValue < 0) {
+      alert("Please enter a valid coffee cost.");
       return;
     }
 
     try {
-      const nowTime = Date.now();
-      const timeToSubtract = hour * 60 * 60 * 1000 + min * 60 * 1000; // Perbaiki 60 * 100 jadi 60 * 1000
-      const timeStamp = nowTime - timeToSubtract;
+      const now = Date.now();
+      const subtractMs =
+        Number(hour) * 60 * 60 * 1000 + Number(min) * 60 * 1000;
+      const timeStamp = now - subtractMs;
 
-      const newData = {
-        name: selectedCoffee,
-        cost: coffeeCost,
+      const coffeeInfo = menuOptions.find((c) => c.name === selectedCoffee);
+      const caffeineValue = coffeeInfo?.caffeine || 0;
+
+      const newEntry = {
+        coffeeName: selectedCoffee,
+        caffeine: caffeineValue,
+        price: costValue,
+        time: new Date(timeStamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       };
 
-      // Update local state
-      const newGlobalData = {
-        ...(globalData || {}),
-        [timeStamp]: newData,
+      const existingHistory = globalData?.coffeeConsumptionHistory || {};
+      const updatedHistory = {
+        ...existingHistory,
+        [timeStamp]: newEntry,
       };
-      setGlobalData(newGlobalData);
 
-      // Update Firestore
+      const updatedData = {
+        ...globalData,
+        coffeeConsumptionHistory: updatedHistory,
+      };
+
+      setGlobalData(updatedData);
+
       const userRef = doc(db, "users", globalUser.uid);
-      await setDoc(userRef, { [timeStamp]: newData }, { merge: true });
+      await setDoc(
+        userRef,
+        { coffeeConsumptionHistory: updatedHistory },
+        { merge: true }
+      );
 
-      console.log("Saved:", timeStamp, selectedCoffee, coffeeCost);
+      if (refreshUserData) await refreshUserData();
 
-      setSelectedCoffee(null);
-      setHour(0);
-      setMin(0);
-      setCoffeeCost(0);
+      handleResetForm();
     } catch (err) {
-      console.error("Failed to save coffee data:", err.message);
+      console.error("Error saving data:", err.message);
     }
-  }
+  };
 
-  function handleCloseModal() {
-    setShowModal(false);
-  }
+  const handleDeleteLastEntry = async () => {
+    try {
+      const history = globalData?.coffeeConsumptionHistory;
+      if (!history || Object.keys(history).length === 0) {
+        alert("No entries to delete.");
+        return;
+      }
+
+      const timestamps = Object.keys(history).map(Number);
+      const latestTimestamp = Math.max(...timestamps);
+
+      const updatedHistory = { ...history };
+      delete updatedHistory[latestTimestamp];
+
+      const updatedData = {
+        ...globalData,
+        coffeeConsumptionHistory: updatedHistory,
+      };
+
+      setGlobalData(updatedData);
+
+      const userRef = doc(db, "users", globalUser.uid);
+      await setDoc(
+        userRef,
+        { coffeeConsumptionHistory: updatedHistory },
+        { merge: true }
+      );
+
+      if (refreshUserData) await refreshUserData();
+
+      alert("Last entry deleted successfully.");
+    } catch (err) {
+      console.error("Error deleting entry:", err.message);
+    }
+  };
 
   return (
     <Stack>
@@ -71,131 +167,140 @@ export default function CoffeeForm(props) {
           <Authentication handleCloseModal={handleCloseModal} />
         </Modal>
       )}
-      <div className="flex items-center gap-1 ml-6">
-        <i className="fa-solid fa-pen-to-square"></i>
-        <h2 className="font-bold font-mono ml-3"> Start Your Tracking Today</h2>
-      </div>
-      <h4 className="font-bold font-mono ml-6">
+
+      <Group ml={25}>
+        <i className="fa-solid fa-pen-to-square" />
+        <Text fw="bold" ff="monospace">
+          Start Your Tracking Today
+        </Text>
+      </Group>
+
+      <Text fw={700} ff="monospace" ml={25}>
         Please choose your coffee type
-      </h4>
-      <Grid justify="center" align="center" ml={10}>
+      </Text>
+
+      <Grid justify="center" align="center" ml={25}>
         <Grid.Col span={12}>
-          {coffeeOptions.slice(0, 5).map((option, optionIndex) => {
-            return (
-              <button
+          <Group spacing="xs">
+            {menuOptions.slice(0, 5).map((option, index) => (
+              <Button
+                key={index}
+                variant={selectedCoffee === option.name ? "filled" : "outline"}
+                color="brown"
+                size="lg"
                 onClick={() => {
                   setSelectedCoffee(option.name);
                   setShowCoffeeTypes(false);
                 }}
-                className={
-                  "button-card ml-2 border-2 cursor-pointer" +
-                  (option.name === selectedCoffee
-                    ? "coffee-button-selected"
-                    : "")
-                }
-                key={optionIndex}
               >
-                <h4>{option.name}</h4>
-                <p>{option.caffeine} mg</p>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => {
-              setShowCoffeeTypes(true);
-              setSelectedCoffee(null);
-            }}
-            className={
-              "button-card ml-2 mt-2 border-2 cursor-pointer" +
-              (showCoffeeTypes ? "coffee-button-selected" : "")
-            }
-          >
-            <h4>Other</h4>
-            <p>n/a</p>
-          </button>
+                <Box>
+                  <Text size="sm">{option.name}</Text>
+                  <Text size="xs" c="black">
+                    {option.caffeine} mg
+                  </Text>
+                </Box>
+              </Button>
+            ))}
+
+            <Button
+              variant={showCoffeeTypes ? "filled" : "outline"}
+              color="gray"
+              size="lg"
+              onClick={() => {
+                setShowCoffeeTypes(true);
+                setSelectedCoffee(null);
+              }}
+            >
+              <Box>
+                <Text size="sm">Other</Text>
+                <Text size="xs" c="black">
+                  n/a
+                </Text>
+              </Box>
+            </Button>
+          </Group>
         </Grid.Col>
       </Grid>
+
       {showCoffeeTypes && (
-        <select
-          className="w-100 ml-3 border-2 rounded-md"
-          onChange={(e) => {
-            setSelectedCoffee(e.target.value);
-          }}
-          name="coffee-list"
-          id="coffee-list"
-        >
-          <option value={null}>Choose type</option>
-          {coffeeOptions.map((option, optionIndex) => {
-            return (
-              <option value={option.name} key={optionIndex}>
-                {option.name} ({option.caffeine} mg)
-              </option>
-            );
-          })}
-        </select>
+        <Select
+          fw="bolder"
+          ff="monospace"
+          label="Choose type"
+          placeholder="Select coffee type"
+          ml={6}
+          maw={250}
+          data={menuOptions.map((option) => ({
+            value: option.name,
+            label: `${option.name} (${option.caffeine} mg)`,
+          }))}
+          value={selectedCoffee}
+          onChange={setSelectedCoffee}
+        />
       )}
-      <h4 className="font-bold font-mono ml-6">Add the Cost ($)</h4>
+
+      <Text fw="bold" ff="monospace" ml={25}>
+        Add the Cost ($)
+      </Text>
       <Input
-        onChange={(e) => {
-          setCoffeeCost(e.target.value);
-        }}
-        variant="filled"
-        placeholder="2.50"
         type="number"
         value={coffeeCost}
-        px={"md"}
+        onChange={(e) => setCoffeeCost(e.target.value)}
+        variant="filled"
+        placeholder="2.50"
+        px="md"
         w={150}
-        ml={6}
+        ml={15}
       />
-      <h4 className="font-bold font-mono ml-6">Time of Consumption</h4>
-      <div className="container-hours">
-        <h6 className="font-normal font-mono">Hours</h6>
-        <select
-          onChange={(e) => {
-            setHour(e.target.value);
-          }}
-          id="hours-select"
+
+      <Text fw="bold" ff="monospace" ml={25}>
+        Time of Consumption
+      </Text>
+      <Group ml={25}>
+        <Select
+          label="Hours"
+          maw={100}
+          data={Array.from({ length: 24 }, (_, i) => ({
+            value: i.toString(),
+            label: i.toString(),
+          }))}
+          value={hour.toString()}
+          onChange={(val) => setHour(Number(val))}
+        />
+
+        <Select
+          label="Minutes"
+          maw={100}
+          data={[0, 5, 10, 15, 30, 45].map((m) => ({
+            value: m.toString(),
+            label: m.toString(),
+          }))}
+          value={min.toString()}
+          onChange={(val) => setMin(Number(val))}
+        />
+      </Group>
+
+      <Group ml={25} mt={10} mb={10}>
+        <Button
+          radius={5}
+          color="brown"
+          w={150}
+          ff="monospace"
+          onClick={handleSubmitForm}
         >
-          {[
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-            19, 20, 21, 22, 23,
-          ].map((hour, hourIndex) => {
-            return (
-              <option key={hourIndex} value={hour}>
-                {hour}
-              </option>
-            );
-          })}
-        </select>
-      </div>
-      <div className="container-mins">
-        <h6 className="font-normal font-mono">Mins</h6>
-        <select
-          onChange={(e) => {
-            setMin(e.target.value);
-          }}
-          id="mins-select"
+          Add Entry
+        </Button>
+        <Button
+          radius={5}
+          variant="filled"
+          color="red"
+          w={150}
+          ff="monospace"
+          onClick={handleDeleteLastEntry}
         >
-          {[0, 5, 10, 15, 30, 45].map((min, minIndex) => {
-            return (
-              <option key={minIndex} value={min}>
-                {min}
-              </option>
-            );
-          })}
-        </select>
-      </div>
-      <Button
-        radius={5}
-        color="rgba(112, 46, 8, 1)"
-        w={150}
-        ml={20}
-        ff={"monospace"}
-        className="mb-5"
-        onClick={handleSubmitForm}
-      >
-        Add Entry
-      </Button>
+          Delete Entry
+        </Button>
+      </Group>
     </Stack>
   );
 }

@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Button, Modal } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useNavigate } from "react-router-dom";
 
-export default function Authentication(props) {
-  const { handleCloseModal } = props;
-  const [isRegistration, setIsRegistration] = useState(false);
+export default function Authentication() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState(null);
 
-  const { signUp, login } = useAuth();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  async function handleAuthenticate() {
+  async function handleAuthenticate(e) {
+    e.preventDefault();
     const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
 
@@ -32,68 +31,49 @@ export default function Authentication(props) {
     try {
       setIsAuthenticating(true);
       setError(null);
-
-      if (isRegistration) {
-        await signUp(trimmedEmail, trimmedPassword);
-      } else {
-        await login(trimmedEmail, trimmedPassword);
-      }
-
-      handleCloseModal();
+      await login(trimmedEmail, trimmedPassword);
+      navigate("/dashboard");
     } catch (err) {
-      console.log(err.message);
-      setError(err.message);
+      console.error("Login error:", err.message);
+      setError("Email or password is incorrect.");
     } finally {
       setIsAuthenticating(false);
     }
   }
 
   return (
-    <>
-      <h2 className="sign-up-text">{isRegistration ? "Sign Up" : "Login"}</h2>
-      <p className="mb-2">
-        {isRegistration ? "Create an account" : "Sign in to your account!"}
-      </p>
-      {error && <p>❌ {error}</p>}
-      <input
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-        }}
-        placeholder="Email"
-        className="border-2 rounded-md mb-3"
-      />
-      <input
-        value={password}
-        onChange={(e) => {
-          setPassword(e.target.value);
-        }}
-        placeholder="******"
-        type="password"
-        className="border-2 rounded-md"
-      />
-      <button
-        onClick={handleAuthenticate}
-        className="border-2 rounded-md w-25 mt-3 hover:bg-blue-400 cursor-pointer"
-      >
-        {isAuthenticating ? "Authenticating..." : "Submit"}
-      </button>
-      <hr />
-      <div className="register-content">
-        <p>
-          {isRegistration
-            ? "Already have an account?"
-            : "Don't have an account?"}
-        </p>
-        <button
-          className="border-2 rounded-md w-25 hover:bg-blue-400 cursor-pointer"
-          onClick={() => {
-            setIsRegistration(!isRegistration);
-          }}
-        >
-          {isRegistration ? "Sign in" : "Sign up"}
-        </button>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+
+        <form onSubmit={handleAuthenticate} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border-2 p-2 rounded-md"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border-2 p-2 rounded-md"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-orange-950 text-white py-2 rounded-md hover:bg-orange-900"
+            disabled={isAuthenticating}
+          >
+            {isAuthenticating ? "Authenticating..." : "Login"}
+          </button>
+        </form>
       </div>
-    </>
+    </div>
   );
 }

@@ -9,6 +9,7 @@
   max-width: 800px;
   width: 100%;
   min-height: 100vh;
+  background-color: bisque;
 }
 
 body {
@@ -167,7 +168,7 @@ input {
 .modal-content {
   position: relative;
   z-index: 101;
-  background: #fff;
+  background: beige;
   color: #000;
   padding: 1rem;
   border-radius: 1rem;
